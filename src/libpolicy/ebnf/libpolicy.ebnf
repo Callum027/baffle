@@ -1,0 +1,46 @@
+statement = policy | entity | service
+
+# Tentative. TODO: allow non-alphanumerical names
+name = r"[A-Za-z][A-Za-z0-9-_]*"
+
+
+# TODO: policy groupings, but what would we use them for?
+policy = "policy", policy_name, policy_action
+policy_name = name
+policy_action = ("allow",  subject, object, app) |
+                ("deny",   subject, object, app) |
+                ("mirror", subject, object, app, mirror_dest) |
+                ("mirror_rewrite", ...) | # TODO: talk with Ian
+                ...
+subject/object = entity_ref, [("and"|"or"), subject/object]
+app = (service_name|protocol), [("and"|"or"), app]
+
+
+entity = "entity", entity_name, entity_attr
+entity_name = name
+entity_ref = ("entity",  entity_name) |
+                  (“group”, group_name) |
+                   packet_attr # Match any entities with this packet attribute
+entity_attr = packet_attr |
+                    (“service”, (service_name|(“group”, group_name))) |
+                    …
+packet_attr = ("ipv4_src", ipv4_src) |
+              ("ipv4_dst", ipv4_dst) |
+              ("mac_src",  mac_src) |
+              ("mac_dst",  mac_dst) |
+              ...
+
+              
+service = "service", service_name, protocol, {("and"|"or"), protocol}
+service_name = name
+protocol = (("tcp"|"udp"), port_num) |
+           ("arp") |
+           ...
+
+
+group = "group", group_type, group_name, group_stmt
+group_type = "policy" |
+             "entity" |
+             "service"
+group_name = name
+group_stmt = "{", (name|(“group", group_name)) [{",", (name|(“group”, group_name))}] "}"

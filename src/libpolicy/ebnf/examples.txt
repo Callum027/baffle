@@ -1,0 +1,16 @@
+Entity:
+entity server1 ipv4_dst 172.16.0.2/24
+entity server1 service ftp
+entity server1 service group internal_access
+entity client1 ipv4_dst 196.168.1.2/24
+
+Policy:
+policy pol2 rewrite ipv4_src 192.168.1.0/24 \ 
+ipv4_dst 172.16.0.1 or mac_dst aa:bb:cc:dd:ee:ff or entity server1 ftp or ssh
+
+Service:
+service ftp tcp 21 and tcp 22
+
+Example:
+group entity servers { server1 }
+group entity machines { group servers, client1 }

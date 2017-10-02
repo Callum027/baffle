@@ -1,0 +1,32 @@
+module libpolicy
+{
+    description  "FAUCET-Bro network policy manager -- policy language";
+    organization "Victoria University of Wellington";
+    contact      "callum.dickinson@ecs.vuw.ac.nz";
+
+    namespace "";
+    prefix "libpolicy";
+
+    revision 2017-10-02
+    {
+        description "Initial revision."
+        reference "";
+    }
+
+    import "inet-types"
+    {
+        prefix "inet";
+    }
+
+    container "statement"
+    {
+        description "Representation of all policy language statements.";
+        type union
+        {
+            type libpolicy:entity;
+            type libpolicy:policy;
+            type libpolicy:service;
+            type libpolicy:group;
+        }
+    }
+}
