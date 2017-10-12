@@ -18,15 +18,59 @@ module libpolicy
         prefix "inet";
     }
 
+    # Types.
+    typedef name
+    {
+        type string
+        {
+            pattern '[A-Za-z][A-Za-z0-9-_]*';
+        }
+    }
+
+    # Statement.
     container "statement"
     {
         description "Representation of all policy language statements.";
         type union
         {
-            type libpolicy:entity;
-            type libpolicy:policy;
-            type libpolicy:service;
-            type libpolicy:group;
+            type entity;
+            type policy;
+            type service;
+            type group;
         }
     }
+
+    # Entity.
+    container "entity"
+    {
+        description "Representation of all policy language statements.";
+
+        key "entity";
+
+        leaf name
+        {
+            type name;
+            description "Name of this entity";
+        }
+
+        type union
+        {
+            type entity;
+            type policy;
+            type service;
+            type group;
+        }
+    }
+
+    container "entity_attr"
+    {
+    }
+
+    # Policy.
+
+
+    # Service.
+
+
+    # Group.
 }
