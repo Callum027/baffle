@@ -1,3 +1,8 @@
+# TODO: add aliases
+# TODO: add entity groups to "app" in policy
+# TODO: remove specific type definitions of subjects/objects/apps from policies
+# TODO: review packet attributes in policies and entities
+
 service http tcp port 80
 service https tcp port 443
 group service www { http, https }
@@ -9,8 +14,7 @@ entity h5 service group www
 
 entity h6 ipv4 192.0.2.3/24
 
-# TODO: entity for subnet? some way to abstract from the policy itself
-# TODO: add entity groups to "app" in policy
+alias hosts_subnet ipv4_subnet 192.0.2.0/24
 
-policy h4_no_h5_www deny entity h4 entity h5 group www 
-policy h5_www allow ipv4_src 192.0.2.0/24 entity h5 group www
+policy h4_no_h5_www deny h4 h5 www 
+policy h5_www allow ipv4_src_subnet hosts_subnet h5 www
