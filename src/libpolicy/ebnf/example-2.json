@@ -1,0 +1,78 @@
+/* TODO: Come up with examples for and/or statements for policies. */
+
+{
+  "statements": [
+    {
+      "type": "service",
+      "name": "http",
+      "protocols": [
+        {
+          "protocol": "tcp",
+          "port": 80
+        }
+      ]
+    },
+    {
+      "type": "service",
+      "name": "https",
+      "protocols": [
+        {
+          "protocol": "tcp",
+          "port": 443
+        }
+      ]
+    },
+    {
+      "type": "service",
+      "name": "group",
+      "members": ["http", "https"]
+    },
+
+    {
+      "type": "entity",
+      "name": "h4",
+      "attr_name": "ipv4",
+      "attr_value": "192.0.2.1/24"
+    },
+    {
+      "type": "entity",
+      "name": "h5",
+      "attr_name": "ipv4",
+      "attr_value": "192.0.2.2/24"
+    },
+    {
+      "type": "entity",
+      "name": "h5",
+      "service": "www"
+    },
+    {
+      "type": "entity",
+      "name": "h6",
+      "attr_name": "ipv4",
+      "attr_value": "192.0.2.3/24"
+    },
+    {
+      "type": "alias",
+      "name": "hosts_subnet",
+      "attr_name": "ipv4_subnet",
+      "attr_value": "192.0.2.0/24"
+    },
+
+    {
+      "type": "policy",
+      "name": "h4_no_h5_www",
+      "action": "deny",
+      "subjects": ["h4"],
+      "objects": ["h5"],
+      "app": "www"
+    },
+    {
+      "type": "policy",
+      "name": "h5_www",
+      "action": "allow",
+      "subjects": ["hosts_subnet"],
+      "objects": ["h5"],
+      "apps": ["www"],
+    }
+  ]
+}

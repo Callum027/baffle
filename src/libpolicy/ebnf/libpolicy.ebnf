@@ -30,12 +30,13 @@ alias = "alias", unique_name, attr_name, attr_value
 entity = "entity", 
                    ("group", unique_name, group_stmt) |
                    (unique_name, 
-                                 (attr_type, attr_value) | # START old "entity_attr"
+                                 (attr_name, attr_value) | # START old "entity_attr"
                                  ("service", unique_name) # "service" is not strictly required here,
                    )                                      # but for other entity attributes, the type is
                                                           # defined, so this is for consistency's sake.
 
-
+                                                          
+# TODO: discuss about "or" in this. Probably useless and can be removed.
 service = "service",
                      ("group", unique_name, group_stmt) |
                      (unique_name, protocol, {("and"|"or"), protocol})
@@ -58,7 +59,7 @@ policy_action = ("allow",  subject, object, app) |
 
 subject/object = (
                      unique_name | # alias/entity/group (alias or entity)
-                     (attr_type, attr_value)
+                     (attr_name, attr_value)
                  ), [("and"|"or"), subject/object]
 
 app = (

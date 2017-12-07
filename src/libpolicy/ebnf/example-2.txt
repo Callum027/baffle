@@ -5,12 +5,12 @@
 
 service http tcp 80 # N.B. more than one port can be defined here e.g. service www tcp 80 and tcp 443
 service https tcp 443
-group service www { http, https } 
+service group www { http, https } 
 
 entity h4 ipv4 192.0.2.1/24
 
 entity h5 ipv4 192.0.2.2/24
-entity h5 service group www
+entity h5 service www
 
 entity h6 ipv4 192.0.2.3/24
 
