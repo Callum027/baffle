@@ -1,46 +1,67 @@
-statement = policy | entity | service
+###
+# Helper definitions for the main language constructs.
+###
 
-# Tentative. TODO: allow non-alphanumerical names
-name = r"[A-Za-z][A-Za-z0-9-_]*"
+
+name = r"[A-Za-z][A-Za-z0-9-_]*" # TODO: allow non-alphanumerical names
+unique_name = name
+
+attr_name = "ipv4_subnet" | "ipv6_subnet" | ...
+attr_value = ipv4_subnet | ipv6_subnet | ...
+
+protocol = (("tcp"|"udp"), port_num) |
+           ("arp") |
+           ...
+
+group_stmt = "{", unique_name [{",", unique_name}] "}"
 
 
-# TODO: policy groupings, but what would we use them for?
-policy = "policy", policy_name, policy_action
-policy_name = name
+###
+# Main language constructs.
+###
+
+
+statement = alias | entity | service | policy
+
+
+alias = "alias", unique_name, attr_name, attr_value
+
+
+entity = "entity", 
+                   ("group", unique_name, group_stmt) |
+                   (unique_name, 
+                                 (attr_type, attr_value) | # START old "entity_attr"
+                                 ("service", unique_name) # "service" is not strictly required here,
+                   )                                      # but for other entity attributes, the type is
+                                                          # defined, so this is for consistency's sake.
+
+
+service = "service",
+                     ("group", unique_name, group_stmt) |
+                     (unique_name, protocol, {("and"|"or"), protocol})
+
+
+# N.B. A lot of information can be inferred from this in the code
+# subject ~= source
+# object ~= destination
+# For example, whether it's a source address/port we're supposed to be looking at
+# in the policy.
+policy = "policy",
+                   ("group", unique_name, group_stmt) |
+                   (unique_name, policy_action)
+                   
 policy_action = ("allow",  subject, object, app) |
                 ("deny",   subject, object, app) |
                 ("mirror", subject, object, app, mirror_dest) |
                 ("mirror_rewrite", ...) | # TODO: talk with Ian
                 ...
-subject/object = entity_ref, [("and"|"or"), subject/object]
-app = (service_name|protocol), [("and"|"or"), app]
 
+subject/object = (
+                     unique_name | # alias/entity/group (alias or entity)
+                     (attr_type, attr_value)
+                 ), [("and"|"or"), subject/object]
 
-entity = "entity", entity_name, entity_attr
-entity_name = name
-entity_ref = ("entity",  entity_name) |
-                  (“group”, group_name) |
-                   packet_attr # Match any entities with this packet attribute
-entity_attr = packet_attr |
-                    (“service”, (service_name|(“group”, group_name))) |
-                    …
-packet_attr = ("ipv4_src", ipv4_src) |
-              ("ipv4_dst", ipv4_dst) |
-              ("mac_src",  mac_src) |
-              ("mac_dst",  mac_dst) |
-              ...
-
-              
-service = "service", service_name, protocol, {("and"|"or"), protocol}
-service_name = name
-protocol = (("tcp"|"udp"), port_num) |
-           ("arp") |
-           ...
-
-
-group = "group", group_type, group_name, group_stmt
-group_type = "policy" |
-             "entity" |
-             "service"
-group_name = name
-group_stmt = "{", (name|(“group", group_name)) [{",", (name|(“group”, group_name))}] "}"
+app = (
+          unique_name | # service/service group
+          protocol
+      ), [("and"|"or"), app]

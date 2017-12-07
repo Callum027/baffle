@@ -1,11 +1,11 @@
-# TODO: add aliases
-# TODO: add entity groups to "app" in policy
-# TODO: remove specific type definitions of subjects/objects/apps from policies
-# TODO: review packet attributes in policies and entities
+# DONE: add aliases
+# DONE: add entity groups to "app" in policy
+# DONE: remove specific type definitions of subjects/objects/apps from policies
+# DONE: review packet attributes in policies and entities
 
-service http tcp port 80
-service https tcp port 443
-group service www { http, https }
+service http tcp 80 # N.B. more than one port can be defined here e.g. service www tcp 80 and tcp 443
+service https tcp 443
+group service www { http, https } 
 
 entity h4 ipv4 192.0.2.1/24
 
@@ -16,5 +16,5 @@ entity h6 ipv4 192.0.2.3/24
 
 alias hosts_subnet ipv4_subnet 192.0.2.0/24
 
-policy h4_no_h5_www deny h4 h5 www 
-policy h5_www allow ipv4_src_subnet hosts_subnet h5 www
+policy h4_no_h5_www deny h4 h5 www
+policy h5_www allow hosts_subnet h5 www
