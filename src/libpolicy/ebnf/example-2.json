@@ -39,8 +39,7 @@
     },
     "h6": {
       "type": "entity",
-      "name": "h6",
-      "ipv4": "192.0.2.3/24",
+      "ipv4": "192.0.2.3/24"
     },
     "hosts_subnet": {
       "type": "alias",

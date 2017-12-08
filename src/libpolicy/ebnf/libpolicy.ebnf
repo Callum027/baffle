@@ -6,14 +6,12 @@
 name = r"[A-Za-z][A-Za-z0-9-_]*" # TODO: allow non-alphanumerical names
 unique_name = name
 
-attr_name = "ipv4_subnet" | "ipv6_subnet" | ...
-attr_value = ipv4_subnet | ipv6_subnet | ...
+attr_name = "ipv4" | "ipv6" | "ipv4_subnet" | "ipv6_subnet" | ...
+attr_value = ipv4 | ipv6 | ipv4_subnet | ipv6_subnet | ...
 
 protocol = (("tcp"|"udp"), port_num) |
            ("arp") |
            ...
-
-group_stmt = "{", unique_name [{",", unique_name}] "}"
 
 
 ###
@@ -21,25 +19,25 @@ group_stmt = "{", unique_name [{",", unique_name}] "}"
 ###
 
 
-statement = alias | entity | service | policy
+statement = alias | group | entity | service | policy
 
 
 alias = "alias", unique_name, attr_name, attr_value
 
 
-entity = "entity", 
-                   ("group", unique_name, group_stmt) |
-                   (unique_name, 
-                                 (attr_name, attr_value) | # START old "entity_attr"
-                                 ("service", unique_name) # "service" is not strictly required here,
-                   )                                      # but for other entity attributes, the type is
+# group | name of the group | member 1 | [member 2...]
+group = "group", member_type, unique_name, unique_name, [{unique_name}]
+member_type = "alias" | "entity" | "service" | "policy"
+
+
+entity = "entity", unique_name, (attr_name, attr_value)
+                                ("service", unique_name) # "service" is not strictly required here,
+                                                          # but for other entity attributes, the type is
                                                           # defined, so this is for consistency's sake.
 
                                                           
 # TODO: discuss about "or" in this. Probably useless and can be removed.
-service = "service",
-                     ("group", unique_name, group_stmt) |
-                     (unique_name, protocol, {"and", protocol})
+service = "service", unique_name, protocol, [{"and", protocol}]
 
 
 # N.B. A lot of information can be inferred from this in the code
@@ -47,9 +45,7 @@ service = "service",
 # object ~= destination
 # For example, whether it's a source address/port we're supposed to be looking at
 # in the policy.
-policy = "policy",
-                   ("group", unique_name, group_stmt) |
-                   (unique_name, policy_action)
+policy = "policy", unique_name, policy_action
                    
 policy_action = ("allow",  subject, object, app) |
                 ("deny",   subject, object, app) |

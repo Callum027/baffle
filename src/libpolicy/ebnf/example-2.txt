@@ -1,11 +1,6 @@
-# DONE: add aliases
-# DONE: add entity groups to "app" in policy
-# DONE: remove specific type definitions of subjects/objects/apps from policies
-# DONE: review packet attributes in policies and entities
-
 service http tcp 80 # N.B. more than one port can be defined here e.g. service www tcp 80 and tcp 443
 service https tcp 443
-service group www { http, https } 
+group service www http https
 
 entity h4 ipv4 192.0.2.1/24
 
