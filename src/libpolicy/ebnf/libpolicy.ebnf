@@ -39,7 +39,7 @@ entity = "entity",
 # TODO: discuss about "or" in this. Probably useless and can be removed.
 service = "service",
                      ("group", unique_name, group_stmt) |
-                     (unique_name, protocol, {("and"|"or"), protocol})
+                     (unique_name, protocol, {"and", protocol})
 
 
 # N.B. A lot of information can be inferred from this in the code

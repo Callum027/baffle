@@ -1,10 +1,9 @@
 /* TODO: Come up with examples for and/or statements for policies. */
 
 {
-  "statements": [
-    {
+  "bindings": {
+    "http": {
       "type": "service",
-      "name": "http",
       "protocols": [
         {
           "protocol": "tcp",
@@ -12,9 +11,8 @@
         }
       ]
     },
-    {
+    "https": {
       "type": "service",
-      "name": "https",
       "protocols": [
         {
           "protocol": "tcp",
@@ -22,57 +20,46 @@
         }
       ]
     },
-    {
-      "type": "service",
-      "name": "group",
+    "www": {
+      "type": "group",
+      "member_type": "service",
       "members": ["http", "https"]
     },
 
-    {
+    
+    "h4": {
       "type": "entity",
-      "name": "h4",
-      "attr_name": "ipv4",
-      "attr_value": "192.0.2.1/24"
+      "ipv4": ["192.0.2.1/24"]
     },
-    {
-      "type": "entity",
-      "name": "h5",
-      "attr_name": "ipv4",
-      "attr_value": "192.0.2.2/24"
-    },
-    {
+    "h5": {
       "type": "entity",
       "name": "h5",
-      "service": "www"
+      "ipv4": ["192.0.2.2/24"],
+      "service": ["www"]
     },
-    {
+    "h6": {
       "type": "entity",
       "name": "h6",
-      "attr_name": "ipv4",
-      "attr_value": "192.0.2.3/24"
+      "ipv4": "192.0.2.3/24",
     },
-    {
+    "hosts_subnet": {
       "type": "alias",
-      "name": "hosts_subnet",
-      "attr_name": "ipv4_subnet",
-      "attr_value": "192.0.2.0/24"
+      "ipv4_subnet": "192.0.2.0/24"
     },
 
-    {
+    "h4_no_h5_www": {
       "type": "policy",
-      "name": "h4_no_h5_www",
       "action": "deny",
-      "subjects": ["h4"],
-      "objects": ["h5"],
-      "app": "www"
+      "subject": ["h4"],
+      "object": ["h5"],
+      "app": ["www"],
     },
-    {
+    "h5_www": {
       "type": "policy",
-      "name": "h5_www",
       "action": "allow",
-      "subjects": ["hosts_subnet"],
-      "objects": ["h5"],
-      "apps": ["www"],
+      "subject": ["hosts_subnet"],
+      "object": ["h5"],
+      "app": ["www"],
     }
-  ]
+  }
 }
