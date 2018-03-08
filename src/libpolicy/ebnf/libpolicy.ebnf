@@ -6,8 +6,8 @@
 name = r"[A-Za-z][A-Za-z0-9-_]*" # TODO: allow non-alphanumerical names
 unique_name = name
 
-attr_name = "ipv4" | "ipv6" | "ipv4_subnet" | "ipv6_subnet" | ...
-attr_value = ipv4 | ipv6 | ipv4_subnet | ipv6_subnet | ...
+packet_attr_name = "ipv4" | "ipv6" | "ipv4_subnet" | "ipv6_subnet" | ...
+packet_attr_value = ipv4 | ipv6 | ipv4_subnet | ipv6_subnet | ...
 
 protocol = (("tcp"|"udp"), port_num) |
            ("arp") |
@@ -22,7 +22,7 @@ protocol = (("tcp"|"udp"), port_num) |
 statement = alias | group | entity | service | policy
 
 
-alias = "alias", unique_name, attr_name, attr_value
+alias = "alias", unique_name, packet_attr_name, packet_attr_value
 
 
 # group | name of the group | member 1 | [member 2...]
@@ -30,13 +30,15 @@ group = "group", member_type, unique_name, unique_name, [{unique_name}]
 member_type = "alias" | "entity" | "service" | "policy"
 
 
-entity = "entity", unique_name, (attr_name, attr_value)
+entity = "entity", unique_name, (entity_attr_name, entity_attr_value)
                                 ("service", unique_name) # "service" is not strictly required here,
-                                                          # but for other entity attributes, the type is
-                                                          # defined, so this is for consistency's sake.
+                                                         # but for other entity attributes, the type is
+                                                         # defined, so this is for consistency's sake.
+# Subset of packet_attr, which only contains specific attributes defined in an entity.
+entity_attr_name = "ipv4" | "ipv6" | ...
+entity_attr_value = ipv4 | ipv6 | ...
 
                                                           
-# TODO: discuss about "or" in this. Probably useless and can be removed.
 service = "service", unique_name, protocol, [{"and", protocol}]
 
 
@@ -55,7 +57,7 @@ policy_action = ("allow",  subject, object, app) |
 
 subject/object = (
                      unique_name | # alias/entity/group (alias or entity)
-                     (attr_name, attr_value)
+                     (packet_attr_name, packet_attr_value)
                  ), [("and"|"or"), subject/object]
 
 app = (

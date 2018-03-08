@@ -1,11 +1,11 @@
-module libpolicy
+module baffle
 {
-    description  "FAUCET-Bro network policy manager -- policy language";
+    description  "Baffle network policy manager -- policy language";
     organization "Victoria University of Wellington";
     contact      "callum.dickinson@ecs.vuw.ac.nz";
 
-    namespace "";
-    prefix "libpolicy";
+    namespace "https://github.com/Callum027/baffle";
+    prefix "policy";
 
     revision 2017-10-02
     {
@@ -23,7 +23,7 @@ module libpolicy
     {
         type string
         {
-            pattern '[A-Za-z][A-Za-z0-9-_]*';
+            
         }
     }
 
@@ -66,23 +66,246 @@ module libpolicy
     {
         
     }
+    
+    ############################################################################
+    
+    
+    typedef name
+    {
+        type string
+        {
+            pattern '[A-Za-z][A-Za-z0-9-_]*';
+        }
+    }
+    
+    #
+    ## Object.
+    ##
+    #
 
-    # Policy.
+    
+    #
+    ## Alias.
+    ## Used to put a name to a specific packet attribute.
+    ## Useful for aliasing things such as subnets.
+    #
+    container "alias"
+    {
+        key "name";
+        
+        leaf "name"
+        {
+            description "Name of this alias. Must be unique amongst all object names.";
+            type name;
+        }
+        
+        leaf "attr"
+        {
+            type packet_attr;
+        }
+    }
+    
+    #
+    ## Policy.
+    #
+    
+    
     container "policy"
     {
         key "name";
         
         leaf "name"
         {
-            type name;
             description "Name of this policy";
+            type name;
         }
 
+        leaf "action"
+        {
+            description "Action to initiate if policy conditions are met."
+            type policy_action;
+        }
         
+        leaf "subject"
+        {
+            description "";
+            type leafref
+            {
+                path "/baffle:policy/entity:name";
+            }
+        }
+        
+        leaf "object"
+        {
+            description "";
+            type leafref
+            {
+                path "/baffle:policy/entity:name";
+            }
+        }
+        
+        leaf "app"
+        {
+            description "";
+            type leafref
+            {
+                path "/baffle:policy/app:name";
+            }
+        }
+    }
+    
+    typedef policy_action
+    {
+        description "";
+        type enumeration
+        {
+            enum "allow";
+            enum "deny";
+            enum "mirror";
+            enum "mirror_rewrite";
+        }
     }
 
-    # Service.
+
+    #
+    ## Entity.
+    #
 
 
-    # Group.
+    container entity
+    {
+        key "name";
+        
+        leaf "name"
+        {
+            description "Name of this entity. Must be unique across all objects.";
+            type name;
+        } 
+
+        # Possible entity attributes.
+        container "attributes"
+        {
+            uses entity_attr;
+        }
+        
+    }
+    
+    # NOTE: should be a superset of entity_attr,
+    # contains attributes not suitable for use in entities,
+    # like "ipv4_subnet" and "ipv6_subnet".
+    typedef packet_attr
+    {
+        type union
+        {
+            type ipv4-address;
+            type ipv6-address;
+
+            type ipv4-prefix;
+            type ipv6-prefix;
+        }
+    }
+    
+    
+    grouping packet_attr
+    {
+        # Way to use:
+        # leaf attr
+        # {
+        #   uses attribute;
+        # }
+        leaf ipv4
+        {
+            type ipv4-address;
+        }
+        
+        leaf ipv6
+        {
+            type ipv6-address;
+        }
+        
+        leaf ipv4_subnet
+        {
+            type ipv4-prefix;
+        }
+        
+        leaf ipv6_subnet
+        {
+            type ipv6-prefix;
+        }
+    }
+    
+    grouping entity_attr
+    {    
+        leaf-list ipv4
+        {
+            description "";
+            type ipv4-address;
+        }
+
+        leaf-list ipv6
+        {
+            description "";
+            type ipv6-address;
+        }
+    }
+
+    #
+    ## Service.
+    #
+
+
+    container "service"
+    {
+        key "name";
+        
+        leaf name
+        {
+            description "Name of this service. Must be unique across all objects.";
+            type name;
+        }
+        
+        leaf-list protocols
+        {
+            description "List of protocol this service encompasses.";
+            type protocol;
+        }
+    }
+
+    typedef "protocol"
+    {
+        type union
+        {
+            type tcp;
+            type udp;
+        }
+    }
+
+
+    #
+    ## Group.
+    #
+
+
+    container "group"
+    {
+        key name;
+
+        leaf name
+        {
+            description "Name of this group. Must be unique across all objects.";
+            type name;
+        }
+
+        leaf type
+        {
+            description "";
+            type ;
+        }
+        
+        leaf-list elements
+        {
+            description "";
+            type container;
+        }
+    }
 }
